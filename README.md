@@ -5,7 +5,7 @@ A simple photo manager that organizes photos into a folder structure based on th
 ## Install
 
 ```bash
-brew tap maks112v/homebrew-tap
+brew tap maks112v/tap
 brew install photomanager
 ```
 

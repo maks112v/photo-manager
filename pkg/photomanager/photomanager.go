@@ -69,12 +69,11 @@ func (p *PhotoManager) Organize() error {
 		return err
 	}
 
-	var albums []Album
-
 	sort.Slice(photoFiles, func(i, j int) bool {
 		return photoFiles[i].CreatedAt.Before(photoFiles[j].CreatedAt)
 	})
 
+	var albums []Album
 	for _, photoFile := range photoFiles {
 		if len(albums) == 0 || photoFile.CreatedAt.Sub(albums[len(albums)-1].Photos[len(albums[len(albums)-1].Photos)-1].CreatedAt).Hours() > 24 {
 			newAlbum := Album{
@@ -109,7 +108,7 @@ func (p *PhotoManager) Organize() error {
 		fmt.Println(album.Path, "Photos in album:", len(album.Photos))
 	}
 
-	input := confirmation.New("Run Files?", confirmation.Yes)
+	input := confirmation.New("Save new albums?", confirmation.Yes)
 
 	if ready, err := input.RunPrompt(); !ready || err != nil {
 		fmt.Println("Aborted")

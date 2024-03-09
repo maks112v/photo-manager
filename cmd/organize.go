@@ -10,27 +10,25 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// organizeCmd represents the organize command
+var pm *photomanager.PhotoManager
+var duration int
+
 var organizeCmd = &cobra.Command{
 	Use:     "organize",
 	Aliases: []string{"o"},
 	Short:   "Run the organizer",
 	Long:    `Run the organizer to move photos to the right location by date / time & event name.`,
 	PreRun: func(cmd *cobra.Command, args []string) {
-		photomanager := photomanager.New(file.New(), settings.New())
-
-		photomanager.PreRunValidation()
+		pm.PreRunValidation()
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		photomanager := photomanager.New(file.New(), settings.New())
-
-		photomanager.Organize()
+		pm.Organize()
 	},
 }
 
 func init() {
-
 	rootCmd.AddCommand(organizeCmd)
+	pm = photomanager.New(file.New(), settings.New())
 
 	// Here you will define your flags and configuration settings.
 
@@ -40,5 +38,5 @@ func init() {
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	organizeCmd.Flags().BoolP("duration", "d", false, "Duration required to create a new album")
+	organizeCmd.Flags().IntVarP(&duration, "duration", "d", 0, "Duration required to create a new album")
 }
