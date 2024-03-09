@@ -9,20 +9,27 @@ import (
 	"github.com/pelletier/go-toml"
 )
 
-type Settings struct {
-	BackupFolder     string `toml:"backup_folder"`
-	SourceFolder     string `toml:"source_folder"`
-	AlbumPathPattern string `toml:"album_path_pattern"`
-	PhotoNamePattern string `toml:"photo_name_pattern"`
+type SettingStruct struct {
+	BackupFolder          string `toml:"backup_folder"`
+	SourceFolder          string `toml:"source_folder"`
+	AlbumPathPattern      string `toml:"album_path_pattern"`
+	PhotoNamePattern      string `toml:"photo_name_pattern"`
+	DurationBetweenAlbums int    `toml:"duration_between_albums"`
 }
 
 //go:generate mockery --name SettingsProvider
 type SettingsProvider interface {
-	GetSettings() (*Settings, error)
-	SaveSettings(settings *Settings) error
+	GetSettings() (*SettingStruct, error)
+	SaveSettings(settings *SettingStruct) error
 }
 
-func GetSettings() (*Settings, error) {
+type Settings struct{}
+
+func New() *Settings {
+	return &Settings{}
+}
+
+func (s *Settings) GetSettings() (*SettingStruct, error) {
 	settingsFilePath := SettingsFilePath()
 
 	// Attempt to open the settings file
@@ -39,7 +46,7 @@ func GetSettings() (*Settings, error) {
 	}
 
 	// Unmarshal the TOML content into a Settings struct
-	var settings Settings
+	var settings SettingStruct
 	err = toml.Unmarshal(content, &settings)
 	if err != nil {
 		return nil, err
@@ -49,7 +56,7 @@ func GetSettings() (*Settings, error) {
 }
 
 // SaveSettings writes the provided Settings struct to the settings.toml file.
-func SaveSettings(settings *Settings) error {
+func (s *Settings) SaveSettings(settings *SettingStruct) error {
 	// Marshal the Settings struct to TOML format
 	content, err := toml.Marshal(settings)
 	if err != nil {

@@ -23,7 +23,7 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		newSettings := settings.Settings{}
+		newSettings := settings.SettingStruct{}
 
 		input := textinput.New("Source Folder Path")
 		input.Placeholder = "The source folder cannot be empty"
@@ -101,7 +101,7 @@ to quickly create a Cobra application.`,
 
 		newSettings.PhotoNamePattern = fileNamePattern
 
-		settings.SaveSettings(&newSettings)
+		settings.New().SaveSettings(&newSettings)
 	},
 }
 
