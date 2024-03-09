@@ -10,8 +10,10 @@ import (
 )
 
 type Settings struct {
-	BackupFolder string `toml:"backup_folder"`
-	SourceFolder string `toml:"source_folder"`
+	BackupFolder     string `toml:"backup_folder"`
+	SourceFolder     string `toml:"source_folder"`
+	AlbumPathPattern string `toml:"album_path_pattern"`
+	PhotoNamePattern string `toml:"photo_name_pattern"`
 }
 
 //go:generate mockery --name SettingsProvider
@@ -23,7 +25,6 @@ type SettingsProvider interface {
 func GetSettings() (*Settings, error) {
 	settingsFilePath := SettingsFilePath()
 
-	fmt.Println("User Path", settingsFilePath)
 	// Attempt to open the settings file
 	file, err := os.Open(settingsFilePath)
 	if err != nil {

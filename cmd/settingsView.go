@@ -28,8 +28,11 @@ to quickly create a Cobra application.`,
 			return
 		}
 
+		fmt.Println("Settings Path: ", settings.SettingsFilePath())
 		fmt.Println("Backup Folder Path: ", setting.BackupFolder)
 		fmt.Println("Source Folder Path: ", setting.SourceFolder)
+		fmt.Println("Album Path Pattern: ", setting.AlbumPathPattern)
+		fmt.Println("Photo Name Pattern: ", setting.PhotoNamePattern)
 	},
 }
 

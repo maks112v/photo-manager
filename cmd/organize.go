@@ -4,19 +4,19 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"bytes"
 	"fmt"
+	"io"
+	"os"
 	"sort"
+	"text/template"
 	"time"
 
+	"github.com/erikgeiser/promptkit/confirmation"
 	"github.com/maks112v/photomanager/pkg/file"
 	"github.com/maks112v/photomanager/pkg/settings"
 	"github.com/spf13/cobra"
 )
-
-type File struct {
-	Path      string
-	CreatedAt time.Time
-}
 
 type Album struct {
 	Name       string
@@ -24,7 +24,8 @@ type Album struct {
 	Month      int
 	PhotoCount int
 	FirstPhoto time.Time
-	Photos     []File
+	Photos     []file.PhotoFile
+	Path       string
 }
 
 // organizeCmd represents the organize command
@@ -39,8 +40,6 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("organize called")
-
 		setting, err := settings.GetSettings()
 
 		if err != nil {
@@ -48,60 +47,101 @@ to quickly create a Cobra application.`,
 			return
 		}
 
-		foundFiles, err := file.GetAllFiles(setting.SourceFolder)
+		photoFiles, err := file.GetAllFiles(setting.SourceFolder)
 		if err != nil {
 			fmt.Println("Error reading files: ", err)
 			return
 		}
 
-		var files []File
-
-		for _, filePath := range foundFiles {
-			createdAt, err := file.CreatedAt(filePath)
-			if err != nil {
-				fmt.Println("Error reading created at: ", err)
-				return
-			}
-			files = append(files, File{Path: filePath, CreatedAt: createdAt})
-		}
-
 		var albums []Album
 
-		sort.Slice(files, func(i, j int) bool {
-			return files[i].CreatedAt.Before(files[j].CreatedAt)
+		sort.Slice(photoFiles, func(i, j int) bool {
+			return photoFiles[i].CreatedAt.Before(photoFiles[j].CreatedAt)
 		})
 
-		for _, file := range files {
-			fmt.Println("File: ", file.Path)
-			fmt.Println("Created at: ", file.CreatedAt)
-
-			// Start a new album if this is the first file or if the gap exceeds 24 hours
-			if len(albums) == 0 || file.CreatedAt.Sub(albums[len(albums)-1].Photos[len(albums[len(albums)-1].Photos)-1].CreatedAt).Hours() > 24 {
+		for _, photoFile := range photoFiles {
+			if len(albums) == 0 || photoFile.CreatedAt.Sub(albums[len(albums)-1].Photos[len(albums[len(albums)-1].Photos)-1].CreatedAt).Hours() > 24 {
 				newAlbum := Album{
 					Name:       fmt.Sprintf("Album %d", len(albums)+1),
-					Year:       file.CreatedAt.Year(),
-					Month:      int(file.CreatedAt.Month()),
-					FirstPhoto: file.CreatedAt,
-					Photos:     []File{file},
+					Year:       photoFile.CreatedAt.Year(),
+					Month:      int(photoFile.CreatedAt.Month()),
+					FirstPhoto: photoFile.CreatedAt,
+					Photos:     []file.PhotoFile{photoFile},
 				}
+
+				tmpl, err := template.New("album-path").Parse("{{.Year}}-{{.Month}} {{.Name}}")
+				if err != nil {
+					panic(err)
+				}
+				var buf bytes.Buffer
+				err = tmpl.Execute(&buf, newAlbum)
+				if err != nil {
+					panic(err)
+				}
+
+				newAlbum.Path = buf.String()
 				albums = append(albums, newAlbum)
 			} else {
 				// Add to the current album
 				currentAlbum := &albums[len(albums)-1]
-				currentAlbum.Photos = append(currentAlbum.Photos, file)
+				currentAlbum.Photos = append(currentAlbum.Photos, photoFile)
 				currentAlbum.PhotoCount = len(currentAlbum.Photos)
 			}
 		}
 
-		// Print album details
-		for i, album := range albums {
-			fmt.Printf("Album %d: %+v\n", i+1, album)
-			fmt.Println("Photos in album:", len(album.Photos))
-			for _, photo := range album.Photos {
-				fmt.Println("Photo:", photo.Path, "Created at:", photo.CreatedAt)
+		for _, album := range albums {
+			fmt.Println(album.Path, "Photos in album:", len(album.Photos))
+		}
+
+		input := confirmation.New("Run Files?", confirmation.Yes)
+
+		if ready, err := input.RunPrompt(); !ready || err != nil {
+			fmt.Println("Aborted")
+			return
+		}
+
+		for _, album := range albums {
+			fmt.Println("Creating album", album.Path)
+
+			if _, err := os.Stat(setting.BackupFolder + "/" + album.Path); os.IsNotExist(err) {
+				if err := os.Mkdir(setting.BackupFolder+"/"+album.Path, os.ModePerm); err != nil {
+					fmt.Println("Error creating album folder: ", err)
+				}
+			}
+
+			for i, photo := range album.Photos {
+				filePath := fmt.Sprintf("%s/%s/%s-%d%s", setting.BackupFolder, album.Path, album.Path, i+1, photo.Ext)
+				CopyFile(photo.Path, filePath)
 			}
 		}
+
 	},
+}
+
+func CopyFile(src, dst string) error {
+	// Open the source file for reading
+	sourceFile, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer sourceFile.Close()
+
+	// Create the destination file for writing
+	destinationFile, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer destinationFile.Close()
+
+	// Copy the contents of the source file to the destination file
+	_, err = io.Copy(destinationFile, sourceFile)
+	if err != nil {
+		return err
+	}
+
+	// Ensure that any writes to the destination file are committed
+	err = destinationFile.Sync()
+	return err
 }
 
 func init() {
