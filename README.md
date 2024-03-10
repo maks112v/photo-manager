@@ -2,6 +2,9 @@
 
 Automatically organize photos from an SD card or folder into albums based on the date the photo was taken. When photos haven't been taken in 24 hours, it will create a new album. It will traverse any subdirectories and organize all photos into the destination directory.
 
+![CleanShot 2024-03-09 at 22 58 42](https://github.com/maks112v/PhotoManager/assets/11082252/1620407a-85cc-43f1-9c18-b703d64d9f25)
+
+
 ## Example
 
 ```
