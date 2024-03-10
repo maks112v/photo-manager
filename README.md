@@ -4,6 +4,7 @@ Automatically organize photos from an SD card or folder into albums based on the
 
 ## Example
 
+```
 /source
   /fuji-101
     - DSCF0001.jpg (2024-01-01 12:00:00)
@@ -23,6 +24,7 @@ Automatically organize photos from an SD card or folder into albums based on the
     - DSCF0004.jpg
     - DSCF0005.jpg
     - DSCF0006.jpg
+```
 
 ## Install
 
