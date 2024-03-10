@@ -15,7 +15,7 @@ var duration int
 
 var organizeCmd = &cobra.Command{
 	Use:     "organize",
-	Aliases: []string{"o"},
+	Aliases: []string{"o", "org"},
 	Short:   "Run the organizer",
 	Long:    `Run the organizer to move photos to the right location by date / time & event name.`,
 	PreRun: func(cmd *cobra.Command, args []string) {

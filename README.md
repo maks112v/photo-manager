@@ -1,10 +1,28 @@
 # Photo Manager
 
-Automatically back camera SD cards into albums based on the date the photo was taken.
+Automatically organize photos from an SD card or folder into albums based on the date the photo was taken. When photos haven't been taken in 24 hours, it will create a new album. It will traverse any subdirectories and organize all photos into the destination directory.
 
-## Demo
+## Example
 
-![Demo](https://media.cleanshot.cloud/media/21998/BxgZUJiMyMAqou1Z9P2xM3U5fj9LuGn4s3Otz3lm.gif?Expires=1710058188&Signature=CsDTz85iiU9yw8fscHuBJ5uPV2kZZRLP6-zY23SLsF2LBPn2dC1eaoyfrfk-mPQ4AKwtH~UjFvbAdNVSyhk2GQcJb1jaxT~wvV8kI7G2W1E5b67cMlZ9J1asgtxJp2VI~SP7jcU3rcb88-RUkNQs2hReRkNVyQagMWsCITof1cJYERkX83k3Aidwz3GK-sSKiOr~Z7~Zkp6sKHopgpom1mgKweD4jGesJgPrV8oWV3fO8aWRe0-OSM2U~zav3Jp-u5yH~MDNzy4VjSVoyrU1Ni~rYujMtHgWMM3oVjE7jVMAsV8iRjXUfxQ880covx5U6DC9d00BLsx0BG0rU8AVIg__&Key-Pair-Id=K269JMAT9ZF4GZ)
+/source
+  /fuji-101
+    - DSCF0001.jpg (2024-01-01 12:00:00)
+    - DSCF0002.jpg (2024-01-01 12:00:01)
+    - DSCF0003.jpg (2024-02-03 12:00:00)
+  /fuji-102
+    - DSCF0004.jpg (2024-02-03 12:00:01)
+    - DSCF0005.jpg (2024-02-03 12:00:02)
+    - DSCF0006.jpg (2024-02-03 12:00:03)
+
+/destination
+  /2024-01 Album 1
+    - DSCF0001.jpg
+    - DSCF0002.jpg
+  /2024-02 Album 2
+    - DSCF0003.jpg
+    - DSCF0004.jpg
+    - DSCF0005.jpg
+    - DSCF0006.jpg
 
 ## Install
 
@@ -26,15 +44,15 @@ photomanager organize
 
 Default `{{.Year}}-{{.Month}} {{.Name}}`
 
-- Name
-- Year
-- Month
+- Name (`Album #`)
+- Year (Year of the first photo in the album)
+- Month (Month of the first photo in the album)
 - PhotoCount
 
 #### Photo File Template Variables
 
 Default `{{.Name}}{{.Ext}}`
 
-- Name
-- Ext
+- Name (Original file name without extension)
+- Ext (File extension with dot e.g. `.jpg`)
 - CreatedAt (Date the photo was taken)

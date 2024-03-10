@@ -44,7 +44,8 @@ func (f *File) GetAllFiles(path string) ([]PhotoFile, error) {
 		}
 
 		// Check the file extension (case insensitive)
-		switch strings.ToLower(filepath.Ext(path)) {
+		fileExt := filepath.Ext(path)
+		switch strings.ToLower(fileExt) {
 		case ".png", ".jpg", ".jpeg", ".raw":
 			createdAt, err := createdAt(path)
 			if err != nil {
@@ -53,10 +54,12 @@ func (f *File) GetAllFiles(path string) ([]PhotoFile, error) {
 
 			file := PhotoFile{
 				Path:      path,
-				Name:      filepath.Base(path),
-				Ext:       strings.ToLower(filepath.Ext(path)),
+				Name:      strings.TrimSuffix(filepath.Base(path), fileExt),
+				Ext:       strings.ToLower(fileExt),
 				CreatedAt: createdAt,
 			}
+
+			fmt.Println(file.Name)
 
 			photoFiles = append(photoFiles, file)
 		}
