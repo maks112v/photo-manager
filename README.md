@@ -14,7 +14,9 @@ Automatically organize photos from an SD card or folder into albums based on the
     - DSCF0004.jpg (2024-02-03 12:00:01)
     - DSCF0005.jpg (2024-02-03 12:00:02)
     - DSCF0006.jpg (2024-02-03 12:00:03)
+```
 
+```
 /destination
   /2024-01 Album 1
     - DSCF0001.jpg
