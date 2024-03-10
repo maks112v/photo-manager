@@ -11,7 +11,9 @@ import (
 )
 
 type PhotoFile struct {
+	Number    int
 	Path      string
+	Name      string
 	Ext       string
 	CreatedAt time.Time
 }
@@ -51,6 +53,7 @@ func (f *File) GetAllFiles(path string) ([]PhotoFile, error) {
 
 			file := PhotoFile{
 				Path:      path,
+				Name:      filepath.Base(path),
 				Ext:       strings.ToLower(filepath.Ext(path)),
 				CreatedAt: createdAt,
 			}

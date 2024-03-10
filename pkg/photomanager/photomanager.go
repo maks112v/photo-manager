@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"html/template"
 	"os"
+	"path"
 	"sort"
 	"time"
 
@@ -43,13 +44,13 @@ func (p *PhotoManager) PreRunValidation() error {
 		return err
 	}
 
-	// Validate back and soource folders are set
-	if settings.BackupFolder == "" {
-		return errors.New("backup folder not set")
-	}
-
+	// Validate source and target folders are set
 	if settings.SourceFolder == "" {
 		return errors.New("source folder not set")
+	}
+
+	if settings.BackupFolder == "" {
+		return errors.New("backup folder not set")
 	}
 
 	return nil
@@ -124,9 +125,22 @@ func (p *PhotoManager) Organize() error {
 			}
 		}
 
+		basePath := setting.BackupFolder + "/" + album.Path
 		for i, photo := range album.Photos {
-			filePath := fmt.Sprintf("%s/%s/%s-%d%s", setting.BackupFolder, album.Path, album.Path, i+1, photo.Ext)
-			p.file.CopyFile(photo.Path, filePath)
+			fmt.Println("Copying photo ", i+1, "/", len(album.Photos))
+			photo.Number = i + 1
+			tmpl, err := template.New("photo-file-name").Parse(setting.PhotoNamePattern)
+			if err != nil {
+				panic(err)
+			}
+			var buf bytes.Buffer
+			err = tmpl.Execute(&buf, photo)
+			if err != nil {
+				panic(err)
+			}
+
+			fileName := buf.String()
+			p.file.CopyFile(photo.Path, path.Join(basePath, fileName))
 		}
 	}
 

@@ -15,3 +15,22 @@ brew install photomanager
 photomanager init
 photomanager organize
 ```
+
+## Reference
+
+#### Album Path Template Variables
+
+Default `{{.Year}}-{{.Month}} {{.Name}}`
+
+- Name
+- Year
+- Month
+- PhotoCount
+
+#### Photo File Template Variables
+
+Default `{{.Name}}{{.Ext}}`
+
+- Name
+- Ext
+- CreatedAt (Date the photo was taken)
