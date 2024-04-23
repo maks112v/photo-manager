@@ -36,6 +36,10 @@ Automatically organize photos from an SD card or folder into albums based on the
 ```bash
 brew tap maks112v/tap
 brew install photomanager
+
+or 
+
+brew install maks112v/tap/photomanager
 ```
 
 ## Usage
