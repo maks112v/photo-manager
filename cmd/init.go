@@ -6,6 +6,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/erikgeiser/promptkit/textinput"
 	"github.com/maks112v/photomanager/pkg/settings"
@@ -93,6 +94,39 @@ var initCmd = &cobra.Command{
 		}
 
 		newSettings.PhotoNamePattern = fileNamePattern
+
+		input = textinput.New("Duration Between Albums")
+		input.Placeholder = "The duration required between photos to start a new album"
+		input.InitialValue = "14"
+		input.Validate = func(input string) error {
+			if input == "" {
+				return fmt.Errorf("the duration between albums cannot be empty")
+			}
+
+			if _, err := strconv.Atoi(input); err != nil {
+				return fmt.Errorf("the duration between albums must be a number")
+			}
+
+			return nil
+		}
+
+		durationBetweenAlbums, err := input.RunPrompt()
+
+		if err != nil {
+			fmt.Printf("Error: %v\n", err)
+
+			os.Exit(1)
+		}
+
+		intDuration, err := strconv.Atoi(durationBetweenAlbums)
+
+		if err != nil {
+			fmt.Printf("Error: %v\n", err)
+
+			os.Exit(1)
+		}
+
+		newSettings.DurationBetweenAlbums = intDuration
 
 		settings.New().SaveSettings(&newSettings)
 	},

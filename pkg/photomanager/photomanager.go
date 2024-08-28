@@ -56,8 +56,17 @@ func (p *PhotoManager) PreRunValidation() error {
 	return nil
 }
 
-func (p *PhotoManager) Organize() error {
+func (p *PhotoManager) Organize(durationOverride int) error {
 	setting, err := p.settings.GetSettings()
+
+	var runDuration int
+	if durationOverride > 0 {
+		runDuration = durationOverride
+	} else {
+		runDuration = setting.DurationBetweenAlbums
+	}
+
+	fmt.Printf("Searching for albums with a duration of %d hours\n", runDuration)
 
 	if err != nil {
 		fmt.Println("Error reading settings: ", err)
@@ -76,7 +85,7 @@ func (p *PhotoManager) Organize() error {
 
 	var albums []Album
 	for _, photoFile := range photoFiles {
-		if len(albums) == 0 || photoFile.CreatedAt.Sub(albums[len(albums)-1].Photos[len(albums[len(albums)-1].Photos)-1].CreatedAt).Hours() > 24 {
+		if len(albums) == 0 || photoFile.CreatedAt.Sub(albums[len(albums)-1].Photos[len(albums[len(albums)-1].Photos)-1].CreatedAt).Hours() > float64(runDuration) {
 			newAlbum := Album{
 				Name:       fmt.Sprintf("Album %d", len(albums)+1),
 				Year:       photoFile.CreatedAt.Year(),

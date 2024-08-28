@@ -34,6 +34,7 @@ var settingsViewCmd = &cobra.Command{
 		fmt.Println("Source Folder Path: ", setting.SourceFolder)
 		fmt.Println("Album Path Pattern: ", setting.AlbumPathPattern)
 		fmt.Println("Photo Name Pattern: ", setting.PhotoNamePattern)
+		fmt.Println("Duration Between Albums: ", setting.DurationBetweenAlbums)
 	},
 }
 
